@@ -197,6 +197,10 @@ class CustomDPOTrainer(DPOTrainer):
                 losses = self.odds_ratio_loss(policy_chosen_logps, policy_rejected_logps)
             elif self.loss_type == "simpo":
                 losses = self.simpo_loss(policy_chosen_logps, policy_rejected_logps)
+            elif self.loss_type in ("sigmoid", "ipo"):
+                losses = self.dpo_loss(
+                    policy_chosen_logps, policy_rejected_logps, None, None
+                )
             else:
                 raise NotImplementedError(f"Unknown loss type: {self.loss_type}.")
 
