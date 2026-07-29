@@ -47,10 +47,16 @@ if is_rouge_available():
 def eval_logit_processor(logits: "torch.Tensor", labels: "torch.Tensor") -> "torch.Tensor":
     r"""Compute the token with the largest likelihood to reduce memory footprint."""
     if isinstance(logits, (list, tuple)):
-        if logits[0].dim() == 3:  # (batch_size, seq_len, vocab_size)
-            logits = logits[0]
-        else:  # moe models have aux loss
-            logits = logits[1]
+        for logit in logits:
+            if isinstance(logit, torch.Tensor) and logit.dim() == 3:
+                logits = logit
+                break
+        else:
+            # Fallback: try first two elements for backward compatibility
+            if len(logits) > 1:
+                logits = logits[1] if logits[0].dim() != 3 else logits[0]
+            else:
+                logits = logits[0] if len(logits) > 0 else logits
 
     if logits.dim() != 3:
         raise ValueError("Cannot process the logits.")
