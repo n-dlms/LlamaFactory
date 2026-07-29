@@ -103,6 +103,13 @@ def is_safetensors_available():
     return _is_package_available("safetensors")
 
 
+def is_flash_attention_available(implementation="flash_attention_2"):
+    available = _is_package_available("flash_attn")
+    if available and implementation.startswith("flash_attention"):
+        return True
+    return available
+
+
 def is_sglang_available():
     return _is_package_available("sglang")
 
